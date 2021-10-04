@@ -8,7 +8,7 @@
   tasks:
       - name: Cut the power supply to all machines
         script: |
-            ../scripts/eg_pms2_lan_driver_power.sh \
+            "{{script_power_off}}" \
             --ip "{{ eg_ip }}" \
             --password "{{ eg_passwd }}" \
             --port "{{ item }}" \
@@ -23,7 +23,7 @@
             minutes: 1
       - name: Restore the power supply to all machines
         script: |
-            ../scripts/eg_pms2_lan_driver_power.sh \
+            "{{script_power_on}}" \
             --ip "{{ eg_ip }}" \
             --password "{{ eg_passwd }}" \
             --port "{{ item }}" \
