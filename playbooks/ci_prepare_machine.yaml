@@ -12,6 +12,9 @@
             tag: "1.0"
             state: present
             source: build
+            buildargs:
+                http_proxy: "http://10.132.105.100:3128"
+                https_proxy: "http://10.132.105.100:3128"
             build:
                 path: "{{ ci_docker_compose_path }}/pxe"
                 pull: true
