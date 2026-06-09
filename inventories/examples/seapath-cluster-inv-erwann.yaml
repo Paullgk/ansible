@@ -1,0 +1,141 @@
+---
+all:
+  children:
+    cluster_machines:
+      children:
+        hypervisors:
+          hosts:
+            hypervisor1:
+              # Admin network settings
+              ansible_host: 10.201.40.11
+              network_interface: enp6s0
+              # Cluster network settings
+              team0_0: "enp8s0"
+              team0_1: "enp9s0"
+              cluster_next_ip_addr: "192.168.55.2"
+              cluster_previous_ip_addr: "192.168.55.3"
+              cluster_ip_addr: "192.168.55.1"
+              br_rstp_priority: 16384
+            hypervisor2:
+              # Admin network settings
+              ansible_host: 10.201.1.12
+              network_interface: enp6s0
+              # Cluster network settings
+              team0_0: "enp8s0"
+              team0_1: "enp9s0"
+              cluster_next_ip_addr: "192.168.55.3"
+              cluster_previous_ip_addr: "192.168.55.1"
+              cluster_ip_addr: "192.168.55.2"
+              br_rstp_priority: 16384
+          # hypervisors common vars
+          vars:
+            # ptp_interface: "eno4"
+            livemigration_user: libvirtadmin
+            isolcpus: "4-N"
+        observers:
+          hosts:
+            observer:
+              # Admin network settings
+              ansible_host: 10.201.1.13
+              network_interface: enp8s0
+              # Cluster network settings
+              team0_0: "ens6f0"
+              team0_1: "ens6f1"
+              cluster_next_ip_addr: "192.168.55.1"
+              cluster_previous_ip_addr: "192.168.55.2"
+              cluster_ip_addr: "192.168.55.3"
+              br_rstp_priority: 12288
+    # Ceph groups
+    mons:
+      hosts:
+        hypervisor1:
+        hypervisor2:
+        observer:
+      vars:
+        # container_registry_url: "10.201.64.127:443"
+        # podman_registry_mirror_url: "{{ container_registry_url }}"
+    osds:
+      hosts:
+        hypervisor1:
+        hypervisor2:
+      vars:
+        ceph_osd_disk: "/dev/disk/by-path/pci-0000:00:17.0-ata-4"
+        lvm_volumes:
+          - data: lv_ceph
+            data_vg: vg_ceph
+            data_size: 6968
+            device: "{{ ceph_osd_disk }}"
+            device_number: 1
+            device_size: 6978
+    clients:
+      hosts:
+        hypervisor1:
+        hypervisor2:
+        observer:
+      vars:
+        user_config: true
+        rbd:
+          name: "rbd"
+          application: "rbd"
+          pg_autoscale_mode: "off"
+          pg_num: 128
+          pgp_num: 128
+        pools:
+          - "{{ rbd }}"
+        keys:
+          - name: client.libvirt
+            caps:
+              mon: 'profile rbd, allow command "osd blacklist"'
+              osd: "allow class-read object_prefix rbd_children, profile rbd pool=rbd"
+            mode: "{{ ceph_keyring_permissions }}"
+  vars:
+    # Ansible vars
+    ansible_connection: ssh
+    ansible_user: ansible
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_remote_tmp: /tmp/.ansible/tmp
+    ansible_ssh_private_key_file: ~/.ssh/sfl-seapath
+    # Main network configuration
+    gateway_addr: "10.201.0.1"
+    dns_servers: "10.201.0.1"
+    ip_addr: "{{ ansible_host }}"
+    subnet: 16
+    apply_network_config: true
+    ntp_servers:
+      - "10.201.0.1"
+    # Ceph settings
+    force_cephadm: true
+    configure_firewall: false
+    ntp_service_enabled: false
+    ceph_origin: distro
+    monitor_address: "{{ cluster_ip_addr }}"
+    public_network: "192.168.55.0/24"
+    cluster_network: "{{ public_network }}"
+    cephadm_network: "{{ public_network }}"
+    cephadm_hostname: "{{ inventory_hostname }}"
+    cephadm_ip_addr: "{{ cluster_ip_addr }}"
+    hostname: "{{ inventory_hostname }}"
+    ceph_conf_overrides:
+      global:
+        osd_pool_default_size: "{{ groups['hypervisors'] | length }}"
+        osd_pool_default_min_size: 1
+        osd_crush_chooseleaf_type: 1
+        mon_osd_min_down_reporters: 1
+      mon:
+        auth_allow_insecure_global_id_reclaim: false
+      osd:
+        osd_min_pg_log_entries: 500
+        osd_max_pg_log_entries: 500
+        osd memory target: 8076326604
+    dashboard_enabled: false
+grafana-server:
+iscsigws:
+iscsi-gws:
+mdss:
+mgrs:
+nfss:
+rbdmirrors:
+rgwloadbalancers:
+rgws:
+standalone_machine:

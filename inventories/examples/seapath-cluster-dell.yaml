@@ -14,18 +14,18 @@
 all:
   hosts:
     hypervisor1:
-      ansible_host: 10.201.40.11 # Administration IP. TODO
-      network_interface: enp6s0 # Administration interface. TODO
+      ansible_host: 10.201.64.125 # Administration IP. TODO
+      network_interface: eno1 # Administration interface. TODO
       # ptp_interface: "eno12419" # PTP interface. TODO
 
     hypervisor2:
-      ansible_host: 10.201.1.12 # Administration IP. TODO
-      network_interface: enp6s0 # Administration interface. TODO
+      ansible_host: 10.201.64.126 # Administration IP. TODO
+      network_interface: eno1 # Administration interface. TODO
       # ptp_interface: "eno12419" # PTP interface. TODO
 
     observer:
-      ansible_host: 10.201.1.13 # Administration IP. TODO
-      network_interface: enp8s0 # Administration interface. TODO
+      ansible_host: 10.201.64.127 # Administration IP. TODO
+      network_interface: enx782d7e14367c # Administration interface. TODO
       # ptp_interface: "eno12419" # PTP interface. TODO
 
   vars:
@@ -58,8 +58,6 @@ all:
     cephadm_hostname: "{{ inventory_hostname }}"
     cephadm_ip_addr: "{{ cluster_ip_addr }}"
 
-    deploy_cephfs: true
-
 # Three hypervisors setup. All machines are part of the hypervisor group.
 hypervisors:
   hosts:
@@ -79,25 +77,25 @@ observers:
 cluster_machines:
   hosts:
     hypervisor1:
-      team0_0: "enp8s0" # Cluster interface connected to hypervisor2. TODO
-      team0_1: "enp9s0" # Cluster interface connected to observer. TODO
-      cluster_ip_addr: "192.168.55.2" # IP address of this node on the cluster. TODO
-      cluster_next_ip_addr : "192.168.55.3" # IP address of hypervisor2 on the cluster. TODO
-      cluster_previous_ip_addr : "192.168.55.1" # IP address of observer on the cluster. TODO
+      team0_0: "eno2" # Cluster interface connected to hypervisor2. TODO
+      team0_1: "eno3" # Cluster interface connected to observer. TODO
+      cluster_ip_addr: "192.168.55.1" # IP address of this node on the cluster. TODO
+      cluster_next_ip_addr : "192.168.55.2" # IP address of hypervisor2 on the cluster. TODO
+      cluster_previous_ip_addr : "192.168.55.3" # IP address of observer on the cluster. TODO
 
     hypervisor2:
-      team0_0: "enp8s0" # Cluster interface connected to observer. TODO
-      team0_1: "enp9s0" # Cluster interface connected to hypervisor1. TODO
-      cluster_ip_addr: "192.168.55.3" # IP address of this node on the cluster. TODO
-      cluster_next_ip_addr : "192.168.55.1" # IP address of observer on the cluster. TODO
-      cluster_previous_ip_addr :  "192.168.55.2" # IP address of hypervisor1 on the cluster. TODO
+      team0_0: "eno2" # Cluster interface connected to observer. TODO
+      team0_1: "eno3" # Cluster interface connected to hypervisor1. TODO
+      cluster_ip_addr: "192.168.55.2" # IP address of this node on the cluster. TODO
+      cluster_next_ip_addr : "192.168.55.3" # IP address of observer on the cluster. TODO
+      cluster_previous_ip_addr :  "192.168.55.1" # IP address of hypervisor1 on the cluster. TODO
 
     observer:
-      team0_0: "ens6f0" # Cluster interface connected to hypervisor1. TODO
-      team0_1: "ens6f1" # Cluster interface connected to hypervisor2. TODO
-      cluster_ip_addr: "192.168.55.1" # IP address of this node on the cluster. TODO
-      cluster_next_ip_addr : "192.168.55.2" # IP address of hypervisor1 on the cluster. TODO
-      cluster_previous_ip_addr :  "192.168.55.3" # IP address of hypervisor2 on the cluster. TODO
+      team0_0: "enp2s0" # Cluster interface connected to hypervisor1. TODO
+      team0_1: "enp3s0" # Cluster interface connected to hypervisor2. TODO
+      cluster_ip_addr: "192.168.55.3" # IP address of this node on the cluster. TODO
+      cluster_next_ip_addr : "192.168.55.1" # IP address of hypervisor1 on the cluster. TODO
+      cluster_previous_ip_addr :  "192.168.55.2" # IP address of hypervisor2 on the cluster. TODO
       br_rstp_priority: 12288 # Do not modify, used by RSTP
 
 # Ceph monitor. All machines in the cluster must be part of mons groups
@@ -137,9 +135,9 @@ osds:
   vars:
     # Set this to the path of the disk that will contains ceph data.
     # The path can be found in "/dev/disk/by-path/"
-    ceph_osd_disk: "/dev/disk/by-path/pci-0000:00:17.0-ata-4" # TODO
-    # devices:
-    #   - "{{ ceph_osd_disk }}"
+    ceph_osd_disk: "/dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:1:0" # TODO
+    devices:
+      - "{{ ceph_osd_disk }}"
     lvm_volumes:
       - data: lv_ceph
         data_vg: vg_ceph
@@ -162,8 +160,8 @@ clients:
       application: "rbd"
       pg_autoscale_mode: "on"
       target_size_ratio: 1
-      # pg_num: 128
-      # pgp_num: 128
+      pg_num: 128
+      pgp_num: 128
     pools:
       - "{{ rbd }}"
     keys:

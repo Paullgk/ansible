@@ -1,0 +1,56 @@
+# This inventory describes a standalone SEAPATH machine (no cluster)
+# It contains all required variables to configure and run your standalone machine.
+# Replace all the TODOs to fit your physical machines.
+# More informations on SEAPATH Wiki: https://lf-energy.atlassian.net/wiki/x/BIDtGQ
+---
+all:
+  hosts:
+    seapath-machine:
+
+      # Admin network settings
+      ansible_host: 192.168.200.10 # administration IP. TODO
+      network_interface: enp2s0 # Administration interface name. TODO
+      gateway_addr: 192.168.200.1 # Administration Gateway. TODO
+      dns_servers: 192.168.200.1 # DNS servers. Remove if not used. TODO
+      subnet: 24 # Subnet mask in CIDR notation. TODO
+
+      # Time synchronisation
+      ptp_interface: eno12419 # PTP interface receiving PTP frames. TODO
+      ntp_servers:
+        - "185.254.101.25" # public NTP server example
+
+      # Debian specific, remove if you use Yocto. TODO
+      admin_user: admin
+
+      # Main network configuration. Nothing to change here
+      ip_addr: "{{ ansible_host }}"
+      apply_network_config: true
+
+      # Ansible variables
+      ansible_connection: ssh
+      ansible_python_interpreter: /usr/bin/python3
+      ansible_remote_tmp: /tmp/.ansible/tmp
+      ansible_user: ansible
+
+# The machine is standalone
+standalone_machine:
+  hosts:
+    seapath-machine:
+# The machine is an hypervisor
+hypervisors:
+  hosts:
+    seapath-machine:
+  vars:
+    isolcpus: "4-N" # List of CPUs to isolate (Debian only). TODO
+
+# Empty groups to prevent warnings, mostly ceph-ansible
+grafana-server:
+iscsigws:
+iscsi-gws:
+mdss:
+mgrs:
+nfss:
+rbdmirrors:
+rgwloadbalancers:
+rgws:
+cluster_machines:

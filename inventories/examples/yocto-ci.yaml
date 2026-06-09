@@ -1,0 +1,58 @@
+---
+all:
+  children:
+    standalone_machine:
+      children:
+        hypervisors:
+          hosts:
+            yoctoCI:
+              ansible_host: "192.168.132.40"
+              ip_addr: "{{ ansible_host }}"
+              network_interface: "enp1s0"
+              ptp_interface: "enp1s0"
+              ptp_vlan_address: 192.168.46.2
+              ptp_vlan_mask: 24
+              ptp_vlanid: 33
+              timemaster_ptp_delay_mechanism: "E2E"
+              ptp_slave: true
+              dns_servers: 192.168.132.1
+              gateway_addr: 192.168.132.1
+              ntp_servers:
+                - "185.254.101.25"
+                - "51.145.123.29"
+              syslog_server_ip: "192.168.132.1"
+              kernel_parameters_restart: false
+              ignored_bridges: []
+              netplan_configurations :
+               - inventories/netplan_admin_br0_example.yaml.j2
+               - inventories/netplan_ptp_interface_example.yaml.j2
+              ovs_bridges:
+                - name: obr0
+                  ports:
+                    - name: obr0P0
+                      type: tap
+                    - name: obr0P1
+                      type: tap
+                    - name: obr0P2
+                      type: tap
+                    - name: obr0P3
+                      type: tap
+                    - name: obr0P4
+                      type: tap
+                    - name: br0External
+                      type: system
+                      interface: "enp3s0"
+              sv_timestamp_logger_image: sv_timestamp_logger_amd64.tar
+    hypervisor:
+        hosts:
+            yoctoCI:
+  vars:
+    ansible_connection: ssh
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_user: ansible
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+    ansible_ssh_private_key_file: ~/.ssh/sfl-seapath
+    ansible_remote_tmp: /tmp/.ansible/tmp
+    bootloader_config_file: /boot/EFI/BOOT/grub.cfg
+    ptp_vlanid: 33
+    sv_vlan: 3
