@@ -11,7 +11,7 @@ on:
 
 jobs:
   virtual-cluster:
-    uses: seapath/virtual-cluster/.github/workflows/ansible-setup.yml@dev
+    uses: seapath/virtual-cluster/.github/workflows/ansible-setup.yml@gh-action
     with:
       ansible_repo: https://github.com/seapath/ansible.git
       ansible_ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
