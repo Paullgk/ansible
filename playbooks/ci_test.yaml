@@ -5,7 +5,16 @@
 # SEAPATH.
 
 ---
+- name: Detect Seapath distribution
+  hosts:
+    - cluster_machines
+    - standalone_machine
+    - VMs
+  roles:
+    - detect_seapath_distro
 - name: Import test_deploy_cukinia_tests playbook
   import_playbook: ./test_deploy_cukinia_tests.yaml
+  when: seapath_distro == "Debian"
+
 - name: Import test_run_cukinia playbook
   import_playbook: ./test_run_cukinia.yaml
