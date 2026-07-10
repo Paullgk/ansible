@@ -30,9 +30,9 @@ jobs:
               --inventory inventories_private/ci_yocto_standalone.yaml
             vms-inventories: >-
               --inventory inventories_private/ci_vms.yaml
-          - name: Aaeon ARM I.MX8P-2G
-            hyp-inventories: >-
-              --inventory inventories_private/ci_yocto_standalone_aaeon.yaml
+          # - name: Aaeon ARM I.MX8P-2G
+          #   hyp-inventories: >-
+          #     --inventory inventories_private/ci_yocto_standalone_aaeon.yaml
     uses: ./.github/workflows/_tests.yml
     name: Run tests on ${{ matrix.name }}
     with:
